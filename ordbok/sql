@@ -1,0 +1,70 @@
+/*発音抽出*/
+SELECT w.PRONUNCIATION
+FROM word w
+WHERE 1=1
+AND w.SPELLING = "ord"
+
+
+/*発音曖昧検索*/
+SELECT w.SPELLING AS "SPELLING", w.PRONUNCIATION AS "PRONUNCIATION"
+FROM word w
+WHERE 1=1
+AND w.SPELLING like "%ord%"
+
+
+/*品詞抽出*/
+SELECT pos.PART_OF_SPEECH
+FROM word w
+, part_of_speech pos
+WHERE 1=1
+AND w.PART_OF_SPEECH_A_ID = pos.PoS_ID
+AND w.SPELLING = "ord"
+
+
+/*活用抽出*/
+SELECT ic.CONJUGATION_PATTERN
+FROM word w
+, irregular_conjugation ic
+WHERE 1=1
+AND w.WORD_ID = ic.WORD_ID
+AND w.SPELLING = "ord"
+
+
+/*意味A抽出*/
+SELECT d.DEFINITION
+FROM definition d
+WHERE d.WORD_ID = (
+	SELECT concat(w.WORD_ID, "A")
+	FROM word w
+	WHERE 1=1
+	AND w.SPELLING = "ord"
+)
+
+
+/*例文1抽出*/
+SELECT e.EXAMPLE_SENTENCE, e.EXAMPLE_SENTENCE_JPN 
+FROM example e
+WHERE e.EXAMPLE_ID = (
+	SELECT d.EXAMPLE_SENTENCE_01_ID
+	FROM definition d
+	WHERE d.WORD_ID = (
+		SELECT concat(w.WORD_ID, "A")
+		FROM word w
+		WHERE 1=1
+		AND w.SPELLING = "ord"
+	)
+)
+
+
+/*綴り、発音、品詞、変換検索（前方一致）*/
+SELECT w.SPELLING AS 'spell' 
+, w.PRONUNCIATION AS 'pro' 
+, pos.PART_OF_SPEECH AS 'pos' 
+, ic.CONJUGATION_PATTERN AS 'con' 
+FROM word w 
+, part_of_speech pos 
+, irregular_conjugation ic 
+WHERE 1=1 
+AND w.PART_OF_SPEECH_A_ID = pos.PoS_ID 
+AND w.WORD_ID = ic.WORD_ID 
+AND w.SPELLING like "ord%"
